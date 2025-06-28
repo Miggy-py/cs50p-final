@@ -31,14 +31,7 @@ def compare_players_over_time(player_list: List[str], y_axis: str = "PTS") -> No
     for name in player_list:
         players.append(Player(name))
 
-    data_frames = []
-
-    for player in players:
-        df = get_player_stats(player)
-        df["PLAYER_NAME"] = player.name
-        data_frames.append(df)
-
-    combined_df = pd.concat(data_frames, ignore_index=True)
+    combined_df = get_combined_data_frames(players)
 
     combined_df["YEAR"] = combined_df["SEASON_ID"].str[:4].astype(int)
 
@@ -57,6 +50,22 @@ def compare_players_over_time(player_list: List[str], y_axis: str = "PTS") -> No
     )
 
     fig.show()
+
+
+def get_combined_data_frames(players: List[Player]) -> pd.DataFrame:
+    data_frames = []
+
+    for player in players:
+        try:
+            df = get_player_stats(player)
+            df["PLAYER_NAME"] = player.name
+            data_frames.append(df)
+        except ValueError as e:
+            print(f"Skipping {player.name}: {e}")
+
+    combined_df = pd.concat(data_frames, ignore_index=True)
+
+    return combined_df
  
 
 

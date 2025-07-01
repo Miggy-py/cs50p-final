@@ -8,33 +8,28 @@ from typing import List
 
 def main():
     start_player_csv()
-    """
-    my_player : Player = Player("Lebron James")
-    career = get_player_stats(my_player)
-    print(career)
 
-    career["YEAR"] = career["SEASON_ID"].str[:4].astype(int)
-    fig = px.line(career, x="YEAR", y="PTS", markers=True, title="LeBron PTS by Year")
-    fig.update_layout(xaxis=dict(tickmode="linear", dtick=1))
+    compare_players_over_time(["LeBron James", "Anthony Davis", "Stephen Curry"], "BLK")
 
-    fig.show()
-    """
-
-    compare_players_over_time(["LeBron James", "Anthony Davis", "Stephen Curry"], "PTS")
 
 def compare_players_over_time(player_list: List[str], y_axis: str = "PTS") -> None:
+    # Check for empty list
     if len(player_list) < 1:
         return None
 
     players: List[Player] = []
 
+    # Get a list of Player objects made from their name
     for name in player_list:
         players.append(Player(name))
 
-    combined_df = get_combined_data_frames(players)
+    # Get one dataframe containing all requested players data
+    combined_df = _get_combined_data_frames(players)
 
+    # Create a new column Year based off of season_id
     combined_df["YEAR"] = combined_df["SEASON_ID"].str[:4].astype(int)
 
+    # Make the figure using the combined dif, x as the year column and y as the column we want to compare
     fig = px.line(
         combined_df,
         x="YEAR",
@@ -44,6 +39,7 @@ def compare_players_over_time(player_list: List[str], y_axis: str = "PTS") -> No
         title=f"{y_axis} per Season: {' vs '.join(player_list)}"
     )
 
+    # Make the figure show every year with a tick of 1, and give a title
     fig.update_layout(
         xaxis=dict(tickmode="linear", dtick=1),
         yaxis_title="Total Points",
@@ -52,7 +48,8 @@ def compare_players_over_time(player_list: List[str], y_axis: str = "PTS") -> No
     fig.show()
 
 
-def get_combined_data_frames(players: List[Player]) -> pd.DataFrame:
+# Helper function to get all data frames into one pd.DataFrame
+def _get_combined_data_frames(players: List[Player]) -> pd.DataFrame:
     data_frames = []
 
     for player in players:
@@ -67,7 +64,6 @@ def get_combined_data_frames(players: List[Player]) -> pd.DataFrame:
 
     return combined_df
  
-
 
 if __name__ == "__main__":
     main()
